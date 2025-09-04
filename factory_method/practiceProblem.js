@@ -11,18 +11,41 @@ class CreditCard {
   }
 }
 
-// Código do cliente
-function main() {
-  const type = "credit card";
+class Pix {
+  pay(type, amount) {
+    console.log(`Pagando com ${type} no valor de R$ ${amount}`);
+  }
+}
 
-  let expenses;
-  if (type === "debit card") {
-    expenses = new DebitCard();
-  } else if (type === "credit card") {
-    expenses = new CreditCard();
+class PaymentFactory {
+  static types = {
+    debit: DebitCard,
+    credit: CreditCard,
+    pix: Pix
   }
 
-  expenses.pay(`${type}`, "R$ 500,00");
+  static createPayment(type) {
+    const PaymentClass = this.types[type];
+    if (!PaymentClass) {
+      throw new Error("Tipo de pagamento ainda não suportado");
+    }
+    return new PaymentClass();
+  }
+}
+
+// Código do cliente
+function main() {
+  const payments = {"debit": 150.0, "credit": 250.0, "pix": 175.0}
+
+  try {
+    Object.entries(payments).forEach(([type, amount]) => {
+      const payment = PaymentFactory.createPayment(type);
+      payment.pay(type, amount);
+    });
+  } catch (err) {
+    console.error("Erro ao realizar pagamento...", err.message);
+  }
+  
 }
 
 main();
