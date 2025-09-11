@@ -36,10 +36,10 @@ class VehicleFactory {
 // Concrete Factories
 class CarFactory extends VehicleFactory {
   createSmallVehicle() {
-    return new Car();
+    return new Motorcycle();
   }
   createLargeVehicle() {
-    return new Motorcycle();
+    return new Car();
   }
 }
 

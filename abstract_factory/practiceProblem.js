@@ -23,23 +23,68 @@ class DocxInvoice {
   }
 }
 
-// Cliente
-function main(format) {
-  let report, invoice;
-
-  if (format === "pdf") {
-    report = new PdfReport();
-    invoice = new PdfInvoice();
-  } else if (format === "docx") {
-    report = new DocxReport();
-    invoice = new DocxInvoice();
-  } else {
-    throw new Error("Formato não suportado");
+//Abstract Factory
+class DocumentsFactory {
+  createPdf() {
+    throw new Error("Método abstrato deve ser implementado")
   }
-
-  console.log(report.generate());
-  console.log(invoice.generate());
+  createDocx() {
+    throw new Error("Método abstrato deve ser implementado")
+  }
 }
 
-main("pdf");
-main("docx");
+//Concrete Factories
+class PdfFactory extends DocumentsFactory {
+  createInvoice() {
+    return new PdfInvoice();
+  }
+
+  createReport() {
+    return new PdfReport();
+  }
+}
+
+class DocxFactory extends DocumentsFactory {
+  createInvoice() {
+    return new DocxInvoice();
+  }
+
+  createReport() {
+    return new DocxReport();
+  }
+}
+
+
+// Cliente
+const factories = {
+  pdf: new PdfFactory(),
+  docx: new DocxFactory()
+}
+
+class DocumentsApp {
+  constructor(factory) {
+    this.invoice = factory.createInvoice();
+    this.report = factory.createReport();
+  }
+
+  startPrinting() {
+    console.log(this.invoice.generate());
+    console.log(this.report.generate());
+  }
+}
+
+function main() {
+  const types = ["pdf", "docx"]
+
+  types.forEach((type) => {
+    console.log(`\n>> Fábrica selecionada: ${type} <<`);
+    const factory = factories[type];
+    if (!factory) throw new Error("Tipo de fábrica desconhecido");
+
+    const app = new DocumentsApp(factory);
+    app.startPrinting();
+  });
+
+}
+
+main();
